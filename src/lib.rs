@@ -47,6 +47,7 @@ impl App {
     }
 
     pub fn render(&self, terminal: &mut tui::Tui) -> io::Result<()> {
+        // Render the initial view state instead.
         terminal.draw(|frame| frame.render_widget(self, frame.size()))?;
         Ok(())
     }
