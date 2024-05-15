@@ -13,15 +13,13 @@ pub enum ActivePane {
     #[default]
     RowGroupBrowser,
     ColumnBrowser,
-    ColumnChunkDetail,
 }
 
 impl ActivePane {
     pub fn toggle(&mut self) {
         *self = match self {
             ActivePane::RowGroupBrowser => ActivePane::ColumnBrowser,
-            ActivePane::ColumnBrowser => ActivePane::ColumnChunkDetail,
-            ActivePane::ColumnChunkDetail => ActivePane::RowGroupBrowser,
+            ActivePane::ColumnBrowser => ActivePane::RowGroupBrowser,
         };
     }
 }
@@ -165,7 +163,6 @@ impl App {
                             *self.column_chunk_view_state.selected_mut() = Some(last_selected + 1);
                         }
                     }
-                    ActivePane::ColumnChunkDetail => {}
                 }
             }
 
@@ -192,7 +189,6 @@ impl App {
                             *self.column_chunk_view_state.selected_mut() = Some(last_selected - 1);
                         }
                     }
-                    ActivePane::ColumnChunkDetail => { /* No-op. */ }
                 }
             }
 

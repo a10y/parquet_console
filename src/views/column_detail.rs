@@ -13,7 +13,7 @@ use ratatui::{
 
 use crate::{
     parquet::{ColumnChunkMetaDataExt, HumanFriendlyStats, PhysicalTypeExt},
-    ActivePane, App,
+    App,
 };
 
 pub struct ColumnChunkSimpleView {
@@ -159,7 +159,7 @@ pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
     let column = app.column_chunk_view_state.selected().unwrap();
     let chunk = app.parquet_metadata.row_groups[row_group].columns()[column].clone();
 
-    let phys_type = chunk.physical_type().human_readable();
+    // let phys_type = chunk.physical_type().human_readable();
     let stats = chunk.stats();
 
     // Add a view that centers it and displays in a pretty way
@@ -171,11 +171,6 @@ pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
     .areas(area);
 
     let lines = vec![
-        Line::from(chunk.metadata().path_in_schema.join("."))
-            .bold()
-            .underlined(),
-        Line::from(phys_type).bold().magenta(),
-        // Show the statistics as well here
         Line::from(format!(
             "min = {}",
             stats.min.unwrap_or("undefined".to_string())
@@ -192,12 +187,6 @@ pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
     ];
 
     Paragraph::new(lines)
-        .block(Block::bordered().title("Column Chunk").style(
-            if app.active_pane == ActivePane::ColumnChunkDetail {
-                Style::default().green()
-            } else {
-                Style::default().white()
-            },
-        ))
+        .block(Block::bordered().title("Column Chunk"))
         .render(centered_rect, buf);
 }

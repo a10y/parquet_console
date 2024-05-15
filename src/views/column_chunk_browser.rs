@@ -2,14 +2,24 @@ use ratatui::{
     buffer::Buffer,
     layout::Rect,
     style::{Style, Stylize},
-    widgets::{Block, List, StatefulWidget},
+    text::{Line, Span},
+    widgets::{Block, List, ListItem, StatefulWidget},
 };
 
-use crate::{ActivePane, App};
+use crate::{parquet::PhysicalTypeExt, ActivePane, App};
 
 pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
-    let items: Vec<String> = (0..app.num_column_chunks())
-        .map(|group| format!("Column Chunk {}", group))
+    let chunks =
+        app.parquet_metadata.row_groups[app.row_group_view_state.selected().unwrap()].columns();
+    let items: Vec<ListItem> = chunks
+        .iter()
+        .map(|col| {
+            ListItem::new(Line::from(vec![
+                Span::from(col.metadata().path_in_schema.join(".")).bold(),
+                Span::from("  "),
+                Span::from(col.physical_type().human_readable()).magenta(),
+            ]))
+        })
         .collect();
     let column_chunk_list = List::new(items)
         .highlight_symbol("> ")
