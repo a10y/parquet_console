@@ -9,7 +9,6 @@ use crate::{ActivePane, App};
 
 pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
     let items: Vec<String> = (0..app.num_column_chunks())
-        .into_iter()
         .map(|group| format!("Column Chunk {}", group))
         .collect();
     let column_chunk_list = List::new(items)

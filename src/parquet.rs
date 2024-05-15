@@ -3,7 +3,6 @@ use parquet2::{
     statistics::{BinaryStatistics, BooleanStatistics, FixedLenStatistics, PrimitiveStatistics},
     types::NativeType,
 };
-use ratatui::{style::Stylize, text::Line};
 
 pub trait PhysicalTypeExt {
     fn human_readable(&self) -> &'static str;

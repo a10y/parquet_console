@@ -13,7 +13,6 @@ use crate::{ActivePane, App};
 
 pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
     let items: Vec<String> = (0..app.num_row_groups())
-        .into_iter()
         .map(|group| format!("Row Group {}", group))
         .collect();
 
