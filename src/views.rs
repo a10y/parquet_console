@@ -5,22 +5,22 @@ use ratatui::{
 
 use crate::App;
 
-use self::{column_chunk::render_column_view, row_group_browser::render};
-
-pub mod column_chunk;
 pub mod column_chunk_browser;
+pub mod column_detail;
 pub mod row_group_browser;
 
 /// Render the user interface.
 pub fn render_ui(frame: &mut Frame, app: &mut App) {
-    let [left_rect, right_rect] =
-        Layout::horizontal([Constraint::Percentage(60), Constraint::Min(0)]).areas(frame.size());
-
-    let [top_right, bottom_right] =
-        Layout::vertical([Constraint::Percentage(70), Constraint::Min(1)]).areas(right_rect);
+    let [first_rect, second_rect, third_rect] = Layout::horizontal([
+        Constraint::Percentage(33),
+        Constraint::Percentage(33),
+        Constraint::Percentage(33),
+    ])
+    .areas(frame.size());
 
     let buf = frame.buffer_mut();
 
-    row_group_browser::render(left_rect, buf, app);
-    render_column_view(bottom_right, buf, app);
+    row_group_browser::render(first_rect, buf, app);
+    column_chunk_browser::render(second_rect, buf, app);
+    column_detail::render(third_rect, buf, app);
 }

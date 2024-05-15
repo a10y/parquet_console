@@ -5,13 +5,33 @@ use ratatui::{
     text::Line,
     widgets::{
         canvas::{Canvas, Rectangle},
-        Block, Borders, Widget,
+        Block, Borders, List, StatefulWidget, Widget,
     },
 };
 
 use crate::{ActivePane, App};
 
 pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
+    let items: Vec<String> = (0..app.num_row_groups())
+        .into_iter()
+        .map(|group| format!("Row Group {}", group))
+        .collect();
+
+    let row_group_list = List::new(items)
+        .highlight_symbol("> ")
+        .highlight_style(Style::new().bold().black().on_white())
+        .block(Block::bordered().title("Row Groups").border_style(
+            if app.active_pane == ActivePane::RowGroupBrowser {
+                Style::default().green()
+            } else {
+                Style::default().white()
+            },
+        ));
+
+    StatefulWidget::render(row_group_list, area, buf, &mut app.row_group_view_state);
+}
+
+pub fn render_canvas(area: Rect, buf: &mut Buffer, app: &mut App) {
     let canvas = Canvas::default()
         .x_bounds([0.0, f64::from(area.width)])
         .y_bounds([0.0, f64::from(area.height)])
@@ -51,7 +71,7 @@ pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
                 ctx.draw(&Rectangle {
                     x: x_margin,
                     y: box_bottom_left_y,
-                    color: if row_group == app.row_group_view_state.selected() {
+                    color: if row_group == app.row_group_view_state.selected().unwrap() {
                         ratatui::style::Color::Green
                     } else {
                         ratatui::style::Color::White

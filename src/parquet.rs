@@ -30,11 +30,11 @@ impl PhysicalTypeExt for PhysicalType {
 ///
 /// All PhysicalTypes are supported except for INT96.
 #[derive(Debug, Default, Clone)]
-pub(crate) struct HumanFriendlyStats {
-    pub(crate) min: Option<String>,
-    pub(crate) max: Option<String>,
-    pub(crate) null_count: Option<i64>,
-    pub(crate) distinct_values: Option<i64>,
+pub struct HumanFriendlyStats {
+    pub min: Option<String>,
+    pub max: Option<String>,
+    pub null_count: Option<i64>,
+    pub distinct_values: Option<i64>,
 }
 
 impl<T: NativeType> From<&PrimitiveStatistics<T>> for HumanFriendlyStats {
@@ -116,14 +116,12 @@ impl From<&FixedLenStatistics> for HumanFriendlyStats {
 /// This is meant to make it very easy to extract out relevant information from a column chunk instead of
 /// attacking all of these things.
 pub trait ColumnChunkMetaDataExt {
-    fn view(self) -> Vec<Line<'static>>;
+    fn stats(self) -> HumanFriendlyStats;
 }
 
 impl ColumnChunkMetaDataExt for &parquet2::metadata::ColumnChunkMetaData {
-    fn view(self) -> Vec<Line<'static>> {
-        let column_chunk = self.column_chunk().meta_data.clone().unwrap();
-        let phys_typ = self.physical_type().human_readable();
-        let min_max_stats: HumanFriendlyStats = match self.physical_type() {
+    fn stats(self) -> HumanFriendlyStats {
+        let stats: HumanFriendlyStats = match self.physical_type() {
             parquet2::schema::types::PhysicalType::Boolean => HumanFriendlyStats::default(),
             parquet2::schema::types::PhysicalType::Int32 => self
                 .statistics()
@@ -194,16 +192,6 @@ impl ColumnChunkMetaDataExt for &parquet2::metadata::ColumnChunkMetaData {
                 .unwrap_or_default(),
         };
 
-        vec![
-            // Column name
-            Line::from(format!("Column: {}", column_chunk.path_in_schema.join(".")))
-                .bold()
-                .green()
-                .underlined(),
-            // Typing
-            Line::from(format!("Physical Type: {}", phys_typ)),
-            // Statistics
-            Line::from(format!("Stats={:?}", min_max_stats)).yellow(),
-        ]
+        stats
     }
 }
