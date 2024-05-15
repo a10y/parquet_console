@@ -1,10 +1,10 @@
 // Add support for ratatui
 
-use std::{io, path::PathBuf};
+use std::path::PathBuf;
 
 use clap::{Args, Parser};
 use color_eyre::eyre::Context;
-use helloterm::{tui, App};
+use helloterm::{start_ui, tui, App};
 
 #[derive(Parser, Debug)]
 enum Commands {
@@ -33,8 +33,8 @@ fn run_tui(args: InspectArgs) -> color_eyre::Result<()> {
     tui::install_hooks()?;
     let mut terminal = tui::init().wrap_err("tui::init failed")?;
 
-    let mut app = App::new(args.file);
-    app.run(&mut terminal).wrap_err("app run failed")?;
+    let mut app = App::from(args.file)?;
+    start_ui(&mut terminal, &mut app)?;
 
     // Teardown
     tui::restore()?;
