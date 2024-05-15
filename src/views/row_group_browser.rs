@@ -77,7 +77,6 @@ pub fn render_canvas(area: Rect, buf: &mut Buffer, app: &mut App) {
                     },
                     width: row_group_width,
                     height: row_group_height,
-                    ..Default::default()
                 })
             }
         });

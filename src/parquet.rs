@@ -10,15 +10,15 @@ pub trait PhysicalTypeExt {
 
 impl PhysicalTypeExt for PhysicalType {
     fn human_readable(&self) -> &'static str {
-        match self {
-            &parquet2::schema::types::PhysicalType::Boolean => "BOOLEAN",
-            &parquet2::schema::types::PhysicalType::Int32 => "INT32",
-            &parquet2::schema::types::PhysicalType::Int64 => "INT64",
-            &parquet2::schema::types::PhysicalType::Int96 => "INT96",
-            &parquet2::schema::types::PhysicalType::Float => "FLOAT",
-            &parquet2::schema::types::PhysicalType::Double => "DOUBLE",
-            &parquet2::schema::types::PhysicalType::ByteArray => "BYTEARRAY",
-            &parquet2::schema::types::PhysicalType::FixedLenByteArray(_) => "FIXED_LEN_BYTEARRAY",
+        match *self {
+            parquet2::schema::types::PhysicalType::Boolean => "BOOLEAN",
+            parquet2::schema::types::PhysicalType::Int32 => "INT32",
+            parquet2::schema::types::PhysicalType::Int64 => "INT64",
+            parquet2::schema::types::PhysicalType::Int96 => "INT96",
+            parquet2::schema::types::PhysicalType::Float => "FLOAT",
+            parquet2::schema::types::PhysicalType::Double => "DOUBLE",
+            parquet2::schema::types::PhysicalType::ByteArray => "BYTEARRAY",
+            parquet2::schema::types::PhysicalType::FixedLenByteArray(_) => "FIXED_LEN_BYTEARRAY",
         }
     }
 }
