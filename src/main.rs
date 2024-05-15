@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use clap::{Args, Parser};
 use color_eyre::eyre::Context;
-use helloterm::{start_ui, tui, App};
+use parquet_console::{start_ui, tui, App};
 
 #[derive(Parser, Debug)]
 enum Commands {
