@@ -24,46 +24,6 @@ impl ActivePane {
     }
 }
 
-/// Wrapper around Ratatui's [ListState] with convenience handles for scrolling
-/// through the list elements.
-pub struct StatefulList {
-    pub(crate) inner: ListState,
-    pub(crate) items: Vec<String>,
-}
-
-impl StatefulList {
-    pub fn from(items: Vec<String>) -> Self {
-        Self {
-            items,
-            inner: ListState::default().with_selected(Some(0)),
-        }
-    }
-
-    /// Select the menu item above the currently selected item.
-    /// Wrap around back to the bottom of the list.
-    pub fn up(&mut self) {
-        if self.selected() == 0 {
-            self.inner.select(Some(self.items.len() - 1));
-        } else {
-            self.inner.select(Some(self.selected() - 1));
-        }
-    }
-
-    /// Select the menu item below the currently selected item.
-    /// If we've reached the bottom of the list, wrap around.
-    pub fn down(&mut self) {
-        if self.selected() == self.items.len() - 1 {
-            self.inner.select(Some(0))
-        } else {
-            self.inner.select(Some(self.selected() + 1))
-        }
-    }
-
-    pub fn selected(&self) -> usize {
-        self.inner.selected().unwrap()
-    }
-}
-
 /// App is the main application, encapsulating all of the state and event-handling logic necessary to
 /// drive the TUI.
 pub struct App {

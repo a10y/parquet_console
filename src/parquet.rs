@@ -1,3 +1,4 @@
+
 use parquet2::{
     schema::types::PhysicalType,
     statistics::{BinaryStatistics, BooleanStatistics, FixedLenStatistics, PrimitiveStatistics},
@@ -112,8 +113,7 @@ impl From<&FixedLenStatistics> for HumanFriendlyStats {
 }
 
 /// Extension trait that turns a parquet2 ColumnChunkMetadata into a list of viewable elements
-/// This is meant to make it very easy to extract out relevant information from a column chunk instead of
-/// attacking all of these things.
+/// This is meant to make it very easy to extract out relevant information from a column chunk.
 pub trait ColumnChunkMetaDataExt {
     fn stats(self) -> HumanFriendlyStats;
 }
