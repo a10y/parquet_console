@@ -1,4 +1,9 @@
-use std::{fs::File, io, path::Path, time::Duration};
+use std::{
+    fs::File,
+    io,
+    path::{Path, PathBuf},
+    time::Duration,
+};
 
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use parquet2::metadata::FileMetaData;
@@ -28,7 +33,7 @@ impl ActivePane {
 /// drive the TUI.
 pub struct App {
     pub file_name: String,
-    pub file: File,
+    pub path: PathBuf,
     pub parquet_metadata: FileMetaData,
     pub exiting: bool,
     pub active_pane: ActivePane,
@@ -49,11 +54,12 @@ impl App {
             .unwrap()
             .to_string();
 
+        let path = file.as_ref().to_owned();
         let mut file = File::open(file.as_ref()).unwrap();
         let parquet_metadata = parquet2::read::read_metadata(&mut file).unwrap();
 
         Ok(Self {
-            file,
+            path,
             file_name,
             parquet_metadata,
             exiting: false,

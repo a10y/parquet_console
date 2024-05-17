@@ -1,3 +1,5 @@
+use std::fs::File;
+
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Layout, Rect},
@@ -16,6 +18,10 @@ pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
     // let phys_type = chunk.physical_type().human_readable();
     let stats = chunk.stats();
 
+    // Sample values
+    let file = File::open(&app.path).unwrap();
+    let sample = crate::parquet::sample_column(file, row_group, column);
+
     // Add a view that centers it and displays in a pretty way
     let [_, centered_rect, _] = Layout::vertical([
         Constraint::Min(0),
@@ -25,6 +31,7 @@ pub fn render(area: Rect, buf: &mut Buffer, app: &mut App) {
     .areas(area);
 
     let lines = vec![
+        Line::from(sample),
         Line::from(format!(
             "min = {}",
             stats.min.unwrap_or("undefined".to_string())

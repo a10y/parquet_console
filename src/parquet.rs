@@ -1,4 +1,7 @@
-
+use parquet::{
+    data_type::{ByteArray, FixedLenByteArray},
+    file::reader::{ChunkReader, FileReader, SerializedFileReader},
+};
 use parquet2::{
     schema::types::PhysicalType,
     statistics::{BinaryStatistics, BooleanStatistics, FixedLenStatistics, PrimitiveStatistics},
@@ -192,5 +195,188 @@ impl ColumnChunkMetaDataExt for &parquet2::metadata::ColumnChunkMetaData {
         };
 
         stats
+    }
+}
+
+/// Read a sample of values from the column chunk. Or just read the individual values from it.
+///
+/// Returns a Stringified sample of column value that we can display.
+pub fn sample_column<R: ChunkReader + 'static>(
+    chunk_reader: R,
+    row_group: usize,
+    column_chunk: usize,
+) -> String {
+    // How can you read a batch of records from a single ColumnChunk?
+    // Find a way to deploy using the native type here.
+    let file_reader = SerializedFileReader::new(chunk_reader).unwrap();
+    let mut column_reader = file_reader
+        .get_row_group(row_group)
+        .unwrap()
+        .get_column_reader(column_chunk)
+        .unwrap();
+
+    let mut def_levels: Vec<i16> = Vec::new();
+    let mut rep_levels: Vec<i16> = Vec::new();
+
+    match column_reader {
+        parquet::column::reader::ColumnReader::BoolColumnReader(ref mut bool_reader) => {
+            let mut values_vec: Vec<bool> = Vec::new();
+            let (complete, non_null, _) = bool_reader
+                .read_records(
+                    10,
+                    Some(&mut def_levels),
+                    Some(&mut rep_levels),
+                    &mut values_vec,
+                )
+                .unwrap();
+
+            let sample = values_vec
+                .iter()
+                .take(10)
+                .map(|b| b.to_string())
+                .collect::<Vec<_>>();
+
+            format!(
+                "count: {}, non-null: {} sample: {:?}",
+                complete, non_null, &sample
+            )
+        }
+        parquet::column::reader::ColumnReader::Int32ColumnReader(ref mut int32_reader) => {
+            let mut values_vec: Vec<i32> = Vec::new();
+            let (complete, non_null, _) = int32_reader
+                .read_records(
+                    10,
+                    Some(&mut def_levels),
+                    Some(&mut rep_levels),
+                    &mut values_vec,
+                )
+                .unwrap();
+
+            let sample = values_vec
+                .iter()
+                .take(10)
+                .map(|i| i.to_string())
+                .collect::<Vec<_>>();
+
+            format!(
+                "count: {}, non-null: {} sample: {:?}",
+                complete, non_null, &sample
+            )
+        }
+        parquet::column::reader::ColumnReader::Int64ColumnReader(ref mut int64_reader) => {
+            let mut values_vec: Vec<i64> = Vec::new();
+            let (complete, non_null, _) = int64_reader
+                .read_records(
+                    10,
+                    Some(&mut def_levels),
+                    Some(&mut rep_levels),
+                    &mut values_vec,
+                )
+                .unwrap();
+
+            let sample = values_vec
+                .iter()
+                .take(10)
+                .map(|i| i.to_string())
+                .collect::<Vec<_>>();
+
+            format!(
+                "count: {}, non-null: {} sample: {:?}",
+                complete, non_null, &sample
+            )
+        }
+        parquet::column::reader::ColumnReader::Int96ColumnReader(_) => {
+            "INT96 sampling not supported".to_string()
+        }
+        parquet::column::reader::ColumnReader::FloatColumnReader(ref mut float32_reader) => {
+            let mut values_vec: Vec<f32> = Vec::new();
+            let (complete, non_null, _) = float32_reader
+                .read_records(
+                    10,
+                    Some(&mut def_levels),
+                    Some(&mut rep_levels),
+                    &mut values_vec,
+                )
+                .unwrap();
+
+            let sample = values_vec
+                .iter()
+                .take(10)
+                .map(|i| i.to_string())
+                .collect::<Vec<_>>();
+
+            format!(
+                "count: {}, non-null: {} sample: {:?}",
+                complete, non_null, &sample
+            )
+        }
+        parquet::column::reader::ColumnReader::DoubleColumnReader(ref mut float64_reader) => {
+            let mut values_vec: Vec<f64> = Vec::new();
+            let (complete, non_null, _) = float64_reader
+                .read_records(
+                    10,
+                    Some(&mut def_levels),
+                    Some(&mut rep_levels),
+                    &mut values_vec,
+                )
+                .unwrap();
+
+            let sample = values_vec
+                .iter()
+                .take(10)
+                .map(|i| i.to_string())
+                .collect::<Vec<_>>();
+
+            format!(
+                "count: {}, non-null: {} sample: {:?}",
+                complete, non_null, &sample
+            )
+        }
+        parquet::column::reader::ColumnReader::ByteArrayColumnReader(ref mut bytearray_reader) => {
+            let mut values_vec: Vec<ByteArray> = Vec::new();
+            let (complete, non_null, _) = bytearray_reader
+                .read_records(
+                    10,
+                    Some(&mut def_levels),
+                    Some(&mut rep_levels),
+                    &mut values_vec,
+                )
+                .unwrap();
+
+            let sample = values_vec
+                .iter()
+                .take(10)
+                .map(|i| i.to_string())
+                .collect::<Vec<_>>();
+
+            format!(
+                "count: {}, non-null: {} sample: {:?}",
+                complete, non_null, &sample
+            )
+        }
+        parquet::column::reader::ColumnReader::FixedLenByteArrayColumnReader(
+            ref mut fixedlen_reader,
+        ) => {
+            let mut values_vec: Vec<FixedLenByteArray> = Vec::new();
+            let (complete, non_null, _) = fixedlen_reader
+                .read_records(
+                    10,
+                    Some(&mut def_levels),
+                    Some(&mut rep_levels),
+                    &mut values_vec,
+                )
+                .unwrap();
+
+            let sample = values_vec
+                .iter()
+                .take(10)
+                .map(|i| i.to_string())
+                .collect::<Vec<_>>();
+
+            format!(
+                "count: {}, non-null: {} sample: {:?}",
+                complete, non_null, &sample
+            )
+        }
     }
 }
